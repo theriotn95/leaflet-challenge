@@ -44,3 +44,76 @@ function createFeatures(earthquakeData) {
   }
   });
   
+  createMap(Eq);
+}
+
+function createMap(Eq) {
+
+  var gray = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors, <a href='https://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery © <a href='https://www.mapbox.com/'>Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.light",
+    accessToken: API_KEY
+  }); 
+  
+  var satellite = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.satellite",
+    accessToken: API_KEY
+  });
+
+  var dark = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.dark",
+    accessToken: API_KEY 
+  }); 
+
+
+
+
+  // Define baseMaps object to hold our base layers
+  var baseMaps = {
+    "Gray Map": gray,
+    "Satellite Map": satellite,
+    "Dark Map": dark
+    
+  };
+
+  
+  var overlayMaps = {
+    Earthquakes: Eq
+  };
+
+  
+  var myMap = L.map("map", {
+    center: [31.58,-99.58],
+    zoom: 2.5,
+    layers: [satellite, Eq]
+  });
+
+ 
+  L.control.layers(baseMaps, overlayMaps, {
+    collapsed: false
+  }).addTo(myMap);
+
+  var legend = L.control({position: 'bottomright'});
+
+  legend.onAdd = function () {
+  
+      var div = L.DomUtil.create('div', 'info legend'),
+          magnitudes = [0, 2.5, 3.5, 4.5, 5.5, 6.5];
+  
+      for (var i = 0; i < magnitudes.length; i++) {
+          div.innerHTML +=
+              '<i style="background:' + markerColor(magnitudes[i] + 1) + '"></i> ' + 
+      + magnitudes[i] + (magnitudes[i + 1] ? ' - ' + magnitudes[i + 1] + '<br>' : ' + ');
+      }
+  
+      return div;
+  };
+  
+  legend.addTo(myMap);
+
+}
